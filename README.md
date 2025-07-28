@@ -116,6 +116,48 @@ cd firestarta
 npm install
 ```
 
+3. **Environment variables ayarlayın**
+```bash
+cp .env.example .env.local
+# .env.local dosyasını düzenleyin
+```
+
+4. **Veritabanını hazırlayın**
+```bash
+npm run migrate
+```
+
+5. **Development server'ı başlatın**
+```bash
+npm run dev
+```
+
+## 🚀 Deployment (Vercel)
+
+### Vercel'e Deploy Etmek İçin:
+
+1. **Vercel Dashboard'da Environment Variables ayarlayın:**
+   - `DATABASE_URL`: Supabase PostgreSQL connection string
+   - `NEXTAUTH_SECRET`: Random secret key
+   - `NEXTAUTH_URL`: Production URL
+   - Diğer gerekli environment variables
+
+2. **GitHub repository'yi Vercel'e bağlayın**
+
+3. **Build Settings:**
+   - Framework Preset: Next.js
+   - Build Command: `npm run build`
+   - Install Command: `npm install`
+
+4. **Deploy edin**
+
+### Önemli Notlar:
+- Production'da `DATABASE_URL` doğru ayarlanmalı
+- Supabase'de IP whitelist ayarları kontrol edilmeli
+- Environment variables Vercel dashboard'da ayarlanmalı
+npm install
+```
+
 3. **Ortam değişkenlerini ayarlayın**
 ```bash
 cp .env.example .env.local
