@@ -7,11 +7,11 @@ import { deleteUser, updateUser } from "@/lib/prisma/users"
 // Exported DELETE request
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { email: string } }
+    { params }: { params: Promise<{ email: string }> }
   ) {
   try {
-    const id = params.email;
-    await deleteUser(id)
+    const { email } = await params;
+    await deleteUser(email)
     return NextResponse.json(
       { message: "User deleted" },
       { status: 200 }
@@ -27,9 +27,9 @@ export async function DELETE(
 // Exported PUT request
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { email: string } }
+  { params }: { params: Promise<{ email: string }> }
   ) {
-  const email = params.email;
+  const { email } = await params;
   const { ...data } = await request.json();
 
   try {

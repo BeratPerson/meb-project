@@ -5,8 +5,6 @@ import bcrypt from "bcryptjs";
 
 interface CustomUser extends User {
   jobTitle?: string;
-  tcKimlikNo?: string;
-  userRole?: 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
 }
 
 export const authOptions: NextAuthOptions = {
@@ -49,8 +47,6 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           image: user.image,
-          tcKimlikNo: user.tcKimlikNo,
-          userRole: user.userRole,
           accounts: [],
         } as User;
       }
@@ -66,12 +62,6 @@ export const authOptions: NextAuthOptions = {
         });
         if (userFromDb?.jobTitle) {
           token.jobTitle = userFromDb.jobTitle;
-        }
-        if (userFromDb?.tcKimlikNo) {
-          token.tcKimlikNo = userFromDb.tcKimlikNo;
-        }
-        if (userFromDb?.userRole) {
-          token.userRole = userFromDb.userRole;
         }
       }
       // Triggers
@@ -90,12 +80,6 @@ export const authOptions: NextAuthOptions = {
       }
       if (token?.jobTitle) {
         (session.user as CustomUser).jobTitle = token.jobTitle as string;
-      }
-      if (token?.tcKimlikNo) {
-        (session.user as CustomUser).tcKimlikNo = token.tcKimlikNo as string;
-      }
-      if (token?.userRole) {
-        (session.user as CustomUser).userRole = token.userRole as 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
       }
       return session;
     },

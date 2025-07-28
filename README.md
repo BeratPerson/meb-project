@@ -155,6 +155,33 @@ npm run dev
 - Production'da `DATABASE_URL` doğru ayarlanmalı
 - Supabase'de IP whitelist ayarları kontrol edilmeli
 - Environment variables Vercel dashboard'da ayarlanmalı
+
+### Deployment Sorunları ve Çözümleri:
+
+#### 1. Database Connection Error
+```
+Error: P1001: Can't reach database server
+```
+**Çözüm:**
+- Vercel dashboard'da `DATABASE_URL` environment variable'ını kontrol edin
+- Supabase'de IP whitelist ayarlarını kontrol edin
+- Supabase connection string'in doğru olduğundan emin olun
+
+#### 2. Build Cache Sorunu
+```
+Error: Command "npm install" exited with 1
+```
+**Çözüm:**
+- Vercel dashboard'da "Redeploy" butonuna tıklayın
+- "Clear cache and redeploy" seçeneğini kullanın
+
+#### 3. Prisma Migration Sorunu
+```
+Error: npx prisma migrate deploy
+```
+**Çözüm:**
+- Migration'ları manuel olarak çalıştırın: `npm run db:deploy`
+- Veya Supabase dashboard'dan migration'ları kontrol edin
 npm install
 ```
 

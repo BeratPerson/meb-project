@@ -29,7 +29,7 @@ const signUpSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+          message: "Passwords don&apos;t match",
   path: ["confirmPassword"],
 });
 
@@ -202,7 +202,7 @@ export const AuthForm = ({ variant }: AuthFormProps) => {
         <p className="px-8 text-xs text-center text-muted-foreground">
           {variant === "signin" ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 className="underline underline-offset-4 hover:text-primary"
                 href="/signup"

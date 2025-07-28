@@ -10,6 +10,7 @@ import { Section } from "@/components/core/section/Section";
 import { getInitials } from "@/lib/utils/initials";
 import { Search, GraduationCap, Users, MessageSquare, ExternalLink } from "lucide-react";
 import { Badge } from "../ui/badge";
+import Image from "next/image";
 
 interface BursiyerDashboardProps {
   user: any;
@@ -83,7 +84,7 @@ export function BursiyerDashboard({ user, profile }: BursiyerDashboardProps) {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Hoş Geldiniz, {user.name}!</h1>
           <p className="text-muted-foreground">
-            MEB 1416 YLSY Bursiyer Platformu'nda araştırma alanınızı keşfedin ve mentorluk alın.
+            MEB 1416 YLSY Bursiyer Platformu&apos;nda araştırma alanınızı keşfedin ve mentorluk alın.
           </p>
         </div>
 
@@ -227,12 +228,14 @@ export function BursiyerDashboard({ user, profile }: BursiyerDashboardProps) {
 
                             {program.university.logo && (
                               <div className="ml-4">
-                                <img
+                                <Image
                                   src={program.university.logo}
                                   alt={program.university.name}
+                                  width={64}
+                                  height={64}
                                   className="w-16 h-16 object-cover rounded-lg border"
                                   onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.style.display = "none";
                                   }}
                                 />
                               </div>
@@ -248,7 +251,7 @@ export function BursiyerDashboard({ user, profile }: BursiyerDashboardProps) {
                   <div className="text-center py-8">
                     <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">
-                      "{selectedField}" alanında henüz program bulunmamaktadır.
+                      &quot;{selectedField}&quot; alanında henüz program bulunmamaktadır.
                     </p>
                   </div>
                 )}
@@ -369,7 +372,7 @@ export function BursiyerDashboard({ user, profile }: BursiyerDashboardProps) {
                   <div className="text-center py-8">
                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">
-                      "{selectedField}" alanında henüz mentor bulunmamaktadır.
+                      &quot;{selectedField}&quot; alanında henüz mentor bulunmamaktadır.
                     </p>
                   </div>
                 )}
