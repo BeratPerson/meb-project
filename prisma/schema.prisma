@@ -9,37 +9,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Lemon Squeezy Models
-
-model Subscription {
-  id                 Int       @id @default(autoincrement())
-  lemonSqueezyId     Int       @unique
-  orderId            Int       @unique
-  name               String
-  email              String
-  status             String
-  renewsAt           DateTime?
-  endsAt             DateTime?
-  trialEndsAt        DateTime?
-  resumesAt          DateTime?
-  userId             String    @unique
-  isUsageBased       Boolean   @default(false)
-  subscriptionItemId Int?      @unique
-  user               User      @relation(fields: [userId], references: [id])
-  customerId         Int?
-
-  @@index([lemonSqueezyId])
-}
-
-model WebhookEvent {
-  id              Int      @id @default(autoincrement())
-  createdAt       DateTime @default(now())
-  eventName       String
-  processed       Boolean  @default(false)
-  body            Json
-  processingError String?
-}
-
 // NextAuth.js Models
 
 model Account {
@@ -78,6 +47,8 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+
+
 model User {
   id            String         @id @default(uuid())
   name          String?
@@ -86,7 +57,11 @@ model User {
   image         String?
   imageUrl      String?
   jobTitle      String?
+  password      String?
+
   accounts      Account[]
   sessions      Session[]
-  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

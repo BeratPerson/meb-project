@@ -3,9 +3,14 @@ import 'next-auth';
 
 declare module 'next-auth' {
   interface User {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
     jobTitle?: string;
+    tcKimlikNo?: string;
+    userRole?: 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
     accounts: Account[];
-    subscriptions: Subscription[];
   }
 
   interface Session {
@@ -13,27 +18,13 @@ declare module 'next-auth' {
   }
 
   interface JWT {
+    id: string;
     jobTitle?: string;
+    tcKimlikNo?: string;
+    userRole?: 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
   }
 
   interface Account {
     provider: string;
-  }
-
-  interface Subscription {
-    customerId: ReactNode;
-    id: number;
-    lemonSqueezyId: number;
-    orderId: number;
-    name: string;
-    email: string;
-    status: string;
-    renewsAt?: Date;
-    endsAt?: Date;
-    trialEndsAt?: Date;
-    resumesAt?: Date;
-    userId: string;
-    isUsageBased: boolean;
-    subscriptionItemId?: number;
   }
 }

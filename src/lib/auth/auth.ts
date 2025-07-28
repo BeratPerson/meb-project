@@ -1,15 +1,15 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions, User } from "next-auth";
-import GithubProvider from 'next-auth/providers/github';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 interface CustomUser extends User {
   jobTitle?: string;
-  // Add subscriptions here and to the session
+  tcKimlikNo?: string;
+  userRole?: 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,
   pages: {
@@ -19,9 +19,41 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          tcKimlikNo: user.tcKimlikNo,
+          userRole: user.userRole,
+          accounts: [],
+        } as User;
+      }
     })
   ],
   callbacks: {
@@ -34,6 +66,12 @@ export const authOptions: NextAuthOptions = {
         });
         if (userFromDb?.jobTitle) {
           token.jobTitle = userFromDb.jobTitle;
+        }
+        if (userFromDb?.tcKimlikNo) {
+          token.tcKimlikNo = userFromDb.tcKimlikNo;
+        }
+        if (userFromDb?.userRole) {
+          token.userRole = userFromDb.userRole;
         }
       }
       // Triggers
@@ -53,17 +91,11 @@ export const authOptions: NextAuthOptions = {
       if (token?.jobTitle) {
         (session.user as CustomUser).jobTitle = token.jobTitle as string;
       }
-      if (token?.userId) {
-        (session.user as CustomUser).id = token.userId as string;
-        // Fetch user with subscriptions
-        const userWithSubscriptions = await prisma.user.findUnique({
-          where: { id: token.userId as string },
-          include: {
-            subscriptions: true, // Include subscriptions in the result
-          },
-        });
-        // Add subscriptions to the session
-        (session.user as CustomUser).subscriptions = userWithSubscriptions?.subscriptions;
+      if (token?.tcKimlikNo) {
+        (session.user as CustomUser).tcKimlikNo = token.tcKimlikNo as string;
+      }
+      if (token?.userRole) {
+        (session.user as CustomUser).userRole = token.userRole as 'MEB_YONETICI' | 'BURSIYER' | 'MENTOR';
       }
       return session;
     },

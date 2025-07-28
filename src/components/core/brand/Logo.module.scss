@@ -9,14 +9,14 @@ $baseLogoHeight: 202px;
   justify-content: center;
   width: auto;
   min-height: 10px;
-  aspect-ratio: $baseLogoWidth / $baseLogoHeight;
+  aspect-ratio: calc($baseLogoWidth / $baseLogoHeight);
 }
 
 .logo {
   display: block;
   position: absolute;
   width: 100%;
-  aspect-ratio: $baseLogoWidth / $baseLogoHeight;
+  aspect-ratio: calc($baseLogoWidth / $baseLogoHeight);
   transform: rotate(-30deg);
   transform-origin: 33% 33%; // Centers(ish) logo in my case
 }
@@ -25,13 +25,13 @@ $baseLogoHeight: 202px;
 $baseLogoWidth: 253px;
 $baseLogoHeight: 202px;
 
-$barHeightPercent: 36 / 202 * 100%;
-$barMarginBottomPercent: 18 / 202 * 100%;
+$barHeightPercent: calc(36 / 202 * 100%);
+$barMarginBottomPercent: calc(18 / 202 * 100%);
 
-$f1WidthPercent: 130 / 253 * 100%;
-$f2WidthPercent: 190 / 253 * 100%;
-$f3WidthPercent: 130 / 253 * 100%;
-$f4WidthPercent: 70 / 253 * 100%;
+$f1WidthPercent: calc(130 / 253 * 100%);
+$f2WidthPercent: calc(190 / 253 * 100%);
+$f3WidthPercent: calc(130 / 253 * 100%);
+$f4WidthPercent: calc(70 / 253 * 100%);
 
 // Bars
 .f1, .f2, .f3, .f4 {
@@ -45,16 +45,16 @@ $f4WidthPercent: 70 / 253 * 100%;
 }
 .f1 {
   width: $f1WidthPercent;
-  left: 66 / 253 * 100%;
+  left: calc(66 / 253 * 100%);
 }
 .f2 {
   width: $f2WidthPercent;
-  left: 60 / 253 * 100%;
+  left: calc(60 / 253 * 100%);
 }
 
 .f3 {
   width: $f3WidthPercent;
-  left: 4 / 253 * 100%;
+  left: calc(4 / 253 * 100%);
 }
 
 .f4 {

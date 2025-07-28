@@ -1,14 +1,16 @@
-import createMiddleware from 'next-intl/middleware';
-import {locales, localePrefix} from '@/lib/intl/navigation';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default createMiddleware({
-  locales,
-  defaultLocale: 'en',
-  localeDetection: false,
-  localePrefix,
-});
- 
+export function middleware(request: NextRequest) {
+  // Simple middleware without internationalization
+  return NextResponse.next();
+}
+
 export const config = {
-  // Match only internationalized pathnames
-  matcher: ['/', '/(de|fr|en)/:path*']
+  // Match all pathnames except for
+  // - api (API routes)
+  // - _next/static (static files)
+  // - _next/image (image optimization files)
+  // - favicon.ico (favicon file)
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 };

@@ -3,6 +3,8 @@ import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,11 +14,23 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { GithubIcon } from "lucide-react";
-const formSchema = z.object({
-  email: z.string().email(),
+
+const signInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const signUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 interface AuthFormProps {
@@ -24,18 +38,61 @@ interface AuthFormProps {
 }
 
 export const AuthForm = ({ variant }: AuthFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-    },
+  const form = useForm<z.infer<typeof signInSchema | typeof signUpSchema>>({
+    resolver: zodResolver(variant === "signin" ? signInSchema : signUpSchema),
+    defaultValues: variant === "signin" 
+      ? { email: "", password: "" }
+      : { name: "", email: "", password: "", confirmPassword: "" },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    signIn("resend", { email: values.email, callbackUrl: "/" });
+  async function onSubmit(values: any) {
+    setIsLoading(true);
+    
+    try {
+      if (variant === "signin") {
+        const result = await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        });
+        
+        if (result?.error) {
+          toast.error("Invalid email or password");
+        } else {
+          toast.success("Signed in successfully");
+          window.location.href = "/";
+        }
+      } else {
+        // Registration
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          toast.error(data.error || "Registration failed");
+        } else {
+          toast.success("Account created successfully! Please sign in.");
+          // Reset form
+          form.reset();
+        }
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   // Messaging
@@ -52,52 +109,119 @@ export const AuthForm = ({ variant }: AuthFormProps) => {
         <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
           {primaryMessage}
         </h1>
-        <p className="text-sm text-muted-foregroun">
-          Enter your email below to {primaryMessage}
+        <p className="text-sm text-muted-foreground">
+          {variant === "signin" 
+            ? "Enter your credentials to sign in" 
+            : "Create your account with email and password"
+          }
         </p>
       </div>
       <div className="grid gap-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            {variant === "signup" && (
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="John Doe"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      required
+                      type="email"
                       placeholder="name@example.com"
                       {...field}
-                      disabled
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="capitalize" disabled>
-              {secondaryMessage} with Email
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {variant === "signup" && (
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <Button type="submit" className="capitalize" disabled={isLoading}>
+              {isLoading ? "Loading..." : secondaryMessage}
             </Button>
           </form>
         </Form>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border/20"></span>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="px-2 bg-background text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-        <Button
-          variant="secondary"
-          onClick={() => signIn("github", { callbackUrl: "/" })}
-          className="capitalize bg-indigo-700 hover:bg-indigo-800"
-        >
-          <GithubIcon className="h-4 mr-1" /> {secondaryMessage} with Github
-        </Button>
+        <p className="px-8 text-xs text-center text-muted-foreground">
+          {variant === "signin" ? (
+            <>
+              Don't have an account?{" "}
+              <Link
+                className="underline underline-offset-4 hover:text-primary"
+                href="/signup"
+              >
+                Sign up
+              </Link>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <Link
+                className="underline underline-offset-4 hover:text-primary"
+                href="/signin"
+              >
+                Sign in
+              </Link>
+            </>
+          )}
+        </p>
         <p className="px-8 text-xs text-center text-muted-foreground">
           By clicking continue, you agree to our{" "}
           <Link
